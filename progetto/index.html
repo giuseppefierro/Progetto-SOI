@@ -1,0 +1,63 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SOI - Lab 04</title>
+  <meta name="description" content="Laboratory #4 of Sistemi Orientati ad Internet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="Lab #4 of Sistemi Orientati ad Internet">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://soi-lab04">
+  <meta property="og:image" content="http://soi-lab04/icon.png">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/eos-icons.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+<body>
+
+<div class="content">
+
+  <!-- Header -->
+  <div class="header">
+    <h1 class="text-center"><img class="logo" src="icon.png" width="52" alt="UniPR Logo">Progetto SOI</h1>
+  </div>
+
+  <!-- Panels -->
+  <div class="panel">
+    <form name="login-user">
+      <!-- utilizzando la form posso sfruttare l'evento submit-->
+      <div class="form-group">
+        <div class="input-group">
+          <input name="task" type="text" value="" placeholder="Username">
+          <input name="task" type="password" value="" placeholder="Password">
+          <button type="submit">
+            <i class="eos-icons">add</i>
+            <span>Login</span>
+          </button>
+          <button type="submit">
+            <i class="eos-icons">add</i>
+            <span>SignUp</span>
+          </button>
+        </div>
+      </div>
+      
+      <p id="login-error-message" style="visibility: hidden; color: maroon;">Please insert valid username and password</p>
+    </form>
+  </div>
+
+<script src="js/vendor/modernizr-3.11.2.min.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SOI - Lab 04</title>
+  <meta name="description" content="Laboratory #4 of Sistemi Orientati ad Internet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="Lab #4 of Sistemi Orientati ad Internet">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://soi-lab04">
+  <meta property="og:image" content="http://soi-lab04/icon.png">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/eos-icons.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+<body>
+
+<div class="content">
+
+  <!-- Header -->
+  <div class="header">
+    <h1 class="text-center"><img class="logo" src="icon.png" width="52" alt="UniPR Logo">HomePage</h1>
+  </div>
+
+  <!-- Panels -->
+  <div class="panel">
+    <form name="new-task">
+      <!-- utilizzando la form posso sfruttare l'evento submit-->
+      <div class="form-group">
+        <div class="input-group">
+          <input name="task" type="text" value="" placeholder="Inserisci il nome del nuovo progetto">
+          <button type="submit">
+            <i class="eos-icons">add</i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="panel">
+
+    <h3><i class="eos-icons">list</i> Progetti disponibili </h3>
+
+    <div class="panel-commands">
+      <a href="#" data-action="complete-selected" title="Mark tasks as complete">Complete selected</a>
+    </div>
+
+    <!-- Tasks -->
+    <div class="tasks"></div>
+
+  </div>
+</div>
+
+<script type="text/html" id="task-template">
+  <!-- Template per il singolo task -->
+  <div class="task-left">
+    <input type="checkbox" id="" name="">
+    <details>
+      <summary><label for="" class="task-item"></label><summary>
+    </details>
+  </div>
+
+  <div class="task-right">
+    <button class="task-btn" name="edit" title="Modifica il nome del progetto"><i class="eos-icons">edit</i></button>
+    <button class="task-btn" name="complete" title="Cancella il progetto"><i class="eos-icons">delete_forever</i></button>
+    <button class="task-btn" name="add" title="Aggiungi dati al progetto"><i class="eos-icons">add</i></button>
+  </div>
+</script>
+
+<script type="text/html" id="task-edit-template">
+  <!-- Template per editing del task -->
+  <div class="form-group">
+    <div class="input-group">
+      <input type="text" placeholder="Please enter some description">
+      <button name="save" class="primary"><i class="eos-icons">save</i></button>
+      <button name="cancel" class="warn"><i class="eos-icons">cancel</i></button>
+    </div>
+  </div>
+</script>
+
+<script src="js/vendor/modernizr-3.11.2.min.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/homepage.js"></script>
+
+</body>
+</html>
