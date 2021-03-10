@@ -1,315 +1,298 @@
 'use strict';
 
-(function () {
-
-  /**
-   * Creates a new sequence function.
-   * @return {function(): number} A function that returns sequences of numbers on each call
-   */
-  function sequencer() {
-    let i = 1;
-    return function () {
-      const n = i;
-      i++;
-      return n;
-    }
+function showProject() {
+  const selected = document.querySelector('input[type="radio"]:checked');
+  if(selected == null){
+    alert("Seleziona un progetto.");
+    return;
   }
+  document.querySelector(".home-page").setAttribute("hidden", true);
 
-  /**
-   * An event handler that keeps track of the callback reference added
-   * to an HTML element using `addEventListener` and removed with
-   * `removeEventListener`.
-   */
-  class Handler {
-    /**
-     * Instances a new `Handler` and registers the `callback` function
-     * for the specified `event` at the `element` level.
-     * @param event {string} The event name
-     * @param element {HTMLElement} An HTML element
-     * @param callback {Function} The function to be invoked on `event`
-     */
-    constructor(event, element, callback) {
-      this._event = event;
-      this._element = element;
-      this._callback = callback;
-      this._element.addEventListener(this._event, this._callback);
-    }
+  document.querySelector(".data-page").removeAttribute("hidden");
 
-    //@formatter:off
-    get event() { return this._event; }
-    get element() { return this._element; }
-    get callback() { return this._callback; }
-    //@formatter:on
+  const h1 = document.getElementById("projectname");
 
-    /**
-     * Unregisters this handler.
-     */
-    unregister() {
-      this._element.removeEventListener(this._event, this._callback);
-    }
-  }
+  h1.textContent = "Progetto: "+ selected.getAttribute("class");
+  
 
-  /**
-   * An entity that is able to emit events certain subscribers are
-   * interested into.
-   */
-  class EventEmitter {
-    constructor() {
-      this._subscribers = [];
-      this._seq = sequencer();
-    }
+  //Dati che copieremo dal DB
+  const data = [[123,"Cane", "5kg", "10m", "user1", 12.30],
+    [456, "Gatto", "5kg", "10m", "user2", 10.30]
+  ]; //in project inseriremo i dati recuperati dal server
 
-    /**
-     * Adds a new subscriber for the specified event.
-     * @param event
-     * @param callback
-     */
-    on(event, callback) {
-      const id = this._seq();
-      this._subscribers.push({id, event, callback});
-      return {
-        unsubscribe: this._unsubscribe.bind(this)
-      };
-    }
+  
+  //Per ogni progetto recuperato inseriamo nella tabella i valori
+  for(var i=0; i<data.length; i++){
+    const tbody = document.querySelector('#databody');
+    const tr = document.createElement('tr');
+    
+    tr.setAttribute("id", data[i][0]);
+    tbody.appendChild(tr);
+    
+    var td = document.createElement('td');
+    td.innerHTML = "<input type='radio' id="+ data[i][0] + " name='data' class=" + data[i][1] + " >";
+    tr.appendChild(td);
 
-    _unsubscribe(anId) {
-      const j = this._subscribers.findIndex(s => s.id === anId);
-      if (j >= 0) {
-        this._subscribers.splice(j, 1);
+    for(var j=0; j<data[0].length; j++){
+      if(j<1){
+        td = document.createElement('th');
       }
-    }
-
-    /**
-     * Emits an event. This immediately triggers any callback that has
-     * been subscribed for the exact same event.
-     * @param event {string} The event name
-     * @param data {Object?} Any additional data passed to the callback.
-     */
-    emit(event, data) {
-      this._subscribers
-        .filter(s => s.event === event)
-        .forEach(s => s.callback(data));
-    }
-  }
-
-  /**
-   * A task.
-   */
-  class TaskModel {
-    constructor(id, description) {
-      this._id = id;
-      this._description = description;
-      this._timestamp = new Date();
-    }
-
-    //@formatter:off
-    get id() { return this._id; }
-    get description() { return this._description; }
-    set description(description) { this._description = description; }
-    get timestamp() { return this._timestamp; }
-    //@formatter:on
-  }
-
-  /**
-   * Encapsulates the control and view logics behind a single task.
-   */
-  class TaskComponent extends EventEmitter {
-    constructor(model) {
-      super();
-      this._model = model;
-      this._element = null;
-      this._handlers = [];
-      this._edit = null;
-    }
-
-    destroy() {
-      this._handlers.forEach(h => h.unregister());
-      this._element.remove();
-    }
-
-    init() {
-      this._element = document.createElement('div');
-      this._element.className = 'task';
-      this._element.innerHTML = document.querySelector('script#task-template').textContent;
-
-      const inp = this._element.querySelector('input');
-      inp.id = `task-${this._model.id}`;
-      inp.name = inp.id;
-      const lbl = this._element.querySelector('label');
-      lbl.htmlFor = inp.id;
-      lbl.textContent = this._model.description;
-
-      const editBtn = this._element.querySelector('.task-right button[name=edit]');
-      let hdlr = new Handler('click', editBtn, () => this.edit());
-      this._handlers.push(hdlr);
-
-      const compBtn = this._element.querySelector('.task-right button[name=complete]');
-      hdlr = new Handler('click', compBtn, () => this.complete());
-      this._handlers.push(hdlr);
-
-      return this._element;
-    }
-
-    edit() {
-      if (this._edit) {
-        this._edit.classList.remove('hidden');
-      } else {
-        this._edit = document.createElement('div');
-        this._edit.className = 'task-edit';
-        this._edit.innerHTML = document.querySelector('script#task-edit-template').textContent;
-
-        const btnSave = this._edit.querySelector('button[name=save]');
-        let hdlr = new Handler('click', btnSave, () => this.save());
-        this._handlers.push(hdlr);
-
-        const btnCancel = this._edit.querySelector('button[name=cancel]');
-        hdlr = new Handler('click', btnCancel, () => this.cancel());
-        this._handlers.push(hdlr);
+      else{
+        td = document.createElement('td');  
       }
-
-      const inp = this._edit.querySelector('input');
-      inp.value = this._model.description;
-
-      const children = [
-        this._element.querySelector('.task-left'),
-        this._element.querySelector('.task-right')];
-
-      children.forEach(c => c.classList.add('hidden'));
-      this._element.append(this._edit);
-    }
-
-    save() {
-      if (this._edit) {
-        const newDesc = this._edit.querySelector('input').value || '';
-        if (newDesc.trim()) {
-          this._model.description = newDesc.trim();
-        }
-        this._update();
-        this._hideEditField();
-      }
-    }
-
-    cancel() {
-      this._hideEditField();
-    }
-
-    complete() {
-      this.emit('completed', this._model);
-    }
-
-    _hideEditField() {
-      if (this._edit) {
-        this._edit.classList.add('hidden');
-      }
-
-      const children = [
-        this._element.querySelector('.task-left'),
-        this._element.querySelector('.task-right')];
-      children.forEach(c => c.classList.remove('hidden'));
-    }
-
-    _update() {
-      if (this._element) {
-        const lbl = this._element.querySelector('label');
-        lbl.textContent = this._model.description;
-      }
+      td.textContent = data[i][j];
+      tr.appendChild(td);
     }
   }
 
-  const seq = sequencer();
-  const tasks = [];
+  const deleteBtn = document.getElementById("btn-delete-data");
+  deleteBtn.addEventListener('click', deleteElem);
 
-  function toast(msg, type) {
-    let t = document.body.querySelector('.toast');
-    if (t) {
-      t.remove();
-    }
-    t = document.createElement('div');
-    t.className = `toast ${type}`;
-    t.innerHTML = msg;
-    document.body.insertBefore(t, document.body.firstChild);
-  }
+  const createBtn = document.getElementById("btn-create-data");
+  createBtn.addEventListener('click', createData);
+}
 
-  function removeTask(task) {
-    const i = tasks.findIndex(t => t.model.id === task.id);
-    if (i >= 0) {
-      const {component} = tasks[i];
-      component.destroy();
-      tasks.splice(i, 1);
-    }
-  }
+function insertData(){ 
+  document.getElementById("insert-data").setAttribute("hidden", true);
 
-  function taskIdOf(el) {
-    const idStr = el.id.substr(5 /*'task-'.length*/);
-    return parseInt(idStr, 10);
-  }
+  const data = document.querySelectorAll(".new-data-info");
+  console.log(data[0].value);
+  console.log(data[1].value);
+  console.log(data[2].value);
+  console.log(data[3].value);
+  const user = "new-user"; //leggi il nome utente
+  const orario = 17.40;
 
-  function removeSelectedTasks() {
-    const inps = document.querySelectorAll('.task-left input[type=checkbox]:checked');
-    const tasks = Array.prototype.slice.apply(inps).map(el => ({id: taskIdOf(el)}));
-    tasks.forEach(removeTask);
-  }
+  const tbody = document.querySelector('#databody');
+  const tr = document.createElement('tr');
+  
+  tr.setAttribute("id", data[0].value);
+  tbody.appendChild(tr);
+  
+  var td = document.createElement('td');
+  td.innerHTML = "<input type='radio' id="+ data[0].value + " name='data' class=" + data[1].value + " >";
+  tr.appendChild(td);
 
-  function addTask(form) {
-    const inp = form.querySelectorAll('input')
-    const desc = (inp.value || '').trim();
-    if (desc !== '') {
-      const root = document.querySelector('.content .panel .tasks');
-      const model = new TaskModel(seq(), desc);
-      const component = new TaskComponent(model);
-      tasks.push({model, component});
-      const el = component.init();
-      root.appendChild(el);
-      component.on('completed', removeTask);
-    }
-  }
-
-  function login(formLogin) {
-    //console.log("Ciao form");
-    const inpUsr = formLogin.querySelectorAll('input')[0];
-    const inpPsw = formLogin.querySelectorAll('input')[1];
-    console.log(inpUsr.value + " " + inpPsw.value);
-    const desc = (inpUsr.value || '').trim();
-
-    if(!inpUsr.value || !inpPsw.value){
-      console.log("Inserire nome + pass");
-      formLogin.querySelector('p').setAttribute("style", "visibility: visible; color: maroon;");
-    }
-    else if(inpUsr.value=="user" && inpPsw.value=="pass"){
-      console.log("Ciao");
-      window.location.href = "home.html";
+  for(var j=0; j<data.length+2; j++){
+    if(j<1){
+      td = document.createElement('th');
     }
     else{
-      //Si può migliorare con il reset
-      form.querySelector('p').setAttribute("style", "visibility: hidden; color: maroon;");
+      td = document.createElement('td');  
     }
-    if (desc !== '') {
-      const root = document.querySelector('.content .panel .tasks');
-      const model = new TaskModel(seq(), desc);
-      const component = new TaskComponent(model);
-      tasks.push({model, component});
-      const el = component.init();
-      root.appendChild(el);
-      component.on('completed', removeTask);
+    if(j<data.length){
+      td.textContent = data[j].value;
     }
+    else if(j==data.length){ 
+      td.textContent=user;
+    }
+    else{ 
+      td.textContent=orario;
+    }
+    tr.appendChild(td);
+  }
+}
+
+function createData(){
+  document.getElementById("insert-data").removeAttribute("hidden");
+  
+  const insertBtn = document.getElementById("btn-insert-data");
+  insertBtn.addEventListener('click', insertData);
+}
+
+function deleteElem() {
+  const selected = document.querySelector('input[type="radio"]:checked');
+  
+  if(selected == null){
+    alert("Seleziona un progetto.");
+    return;
+  }
+  
+  console.log("Cancello progetto " + selected.getAttribute("id"));
+
+  const id = selected.getAttribute("id");
+
+  const rowToDelete = document.getElementById(id);
+
+  //Come cancellare su html
+  rowToDelete.remove();
+
+}
+
+function insertProject() {
+  document.querySelector(".new-page").setAttribute("hidden", true);
+
+  const id = document.getElementById("projectid").value;
+  const name = document.getElementById("projectname").value;
+  const fields = document.getElementById("fields").value;
+  const user = "new-user"; //leggi il nome utente
+  const orario = 17.40;
+
+  const tbody = document.querySelector('#projectbody');
+  const tr = document.createElement('tr');
+  
+  tr.setAttribute("id", id);
+  tbody.appendChild(tr);
+  
+  var td = document.createElement('td');
+  td.innerHTML = "<input type='radio' id="+ id + " name='data' class=" + name + " >";
+  tr.appendChild(td);
+
+  for(var j=0; j<4; j++){
+    if(j<2){
+      td = document.createElement('th');
+      if(j==0){
+        td.textContent = id;
+      }
+      else{
+        td.textContent = name;
+      }
+    }
+    else{
+      td = document.createElement('td');  
+      if(j==2){
+        td.textContent=user;
+      }
+      else{
+        td.textContent=orario;
+      }
+    }
+    tr.appendChild(td);
+  }
+}
+
+// Da implementare nella homepage invece che in una diversa
+function createProject() {
+  console.log("crea progetto");
+
+  document.querySelector(".new-page").removeAttribute("hidden");
+
+  const insertBtn = document.getElementById("btn-insert-project");
+  insertBtn.addEventListener('click', insertProject);
+  
+}
+
+function mainPage(){
+  document.querySelector(".home-page").removeAttribute("hidden");
+
+  /**
+   * Contatto il server con GET e recupero:
+   * ID dei progetti, utente ultima modifica, ultima modifica
+   * 
+   * Devo riempire la tabella 
+   */
+  const projects = [[123,"Animali", "user1", 12.30],
+    [456, "Auto", "user2", 10.30],
+    [789, "Scarpe", "user3", 9.30]
+  ]; //in project inseriremo i dati recuperati dal server
+
+  
+  //Per ogni progetto recuperato inseriamo nella tabella i valori
+  for(var i=0; i<projects.length; i++){
+    const tbody = document.querySelector('#projectbody');
+    const tr = document.createElement('tr');
+    
+    tr.setAttribute("id", projects[i][0]);
+    tbody.appendChild(tr);
+    
+    var td = document.createElement('td');
+    td.innerHTML = "<input type='radio' id="+ projects[i][0] + " name='project' class=" + projects[i][1] + " >";
+    tr.appendChild(td);
+
+    for(var j=0; j<projects[0].length; j++){
+      if(j<2){
+        td = document.createElement('th');
+      }
+      else{
+        td = document.createElement('td');  
+      }
+      td.textContent = projects[i][j];
+      tr.appendChild(td);
+    }
+    
   }
 
-  function init() {
-    const formLogin = document.forms.namedItem('login-user');
-    
-    if (!formLogin) {
-      toast('Cannot initialize components: no <b>form</b> found', 'error');
-    }
-    
-    formLogin.addEventListener('submit', function ($event) {
-      $event.preventDefault();
-      login(formLogin);
-      formLogin.reset();
-    });
+  const updateBtn = document.getElementById("btn-update-project");
+  updateBtn.addEventListener('click', showProject);
 
+  const createBtn = document.getElementById("btn-create-project");
+  createBtn.addEventListener('click', createProject);
+
+  const deleteBtn = document.getElementById("btn-delete-project");
+  deleteBtn.addEventListener('click', deleteElem);
+}
+
+/**
+ * Funzione di associata al click sul bottone di Login
+ * nella pagina iniziale.
+ * questa sarà una get
+ */
+function login(){
+  const inpUser = document.getElementById("user");
+  //const user = (inpUser.value || '').trim();
+  
+  const inpPsw = document.getElementById("pass");
+  //const psw = (inpPsw.value || '').trim();
+
+  inpUser.value = "";
+  inpPsw.value = "";
+
+  // if(user=='' || psw==''){
+  //   alert("Inserisci user e password.");
+  //   return;
+  // }
+  
+  /**
+   * Mi dovrò collegare al server per valutare
+   * se user e password sono presenti nel DB.
+  */
+  var checked = true;
+  /**
+   * Se user,password OK => home-page
+   * altrimenti msg di errore
+   */
+  if(checked){
+    document.querySelector(".login-page").setAttribute("hidden", true);
+    mainPage();
+  }
+  else{
+    alert("Non sei registrato, registrati.");
+  }
+  
+
+}
+
+/**
+ * Questa sarà un richiesta di POST sul server
+ */
+function signup(){
+  const inpUser = document.getElementById("user");
+  const user = (inpUser.value || '').trim();
+  
+  const inpPsw = document.getElementById("pass");
+  const psw = (inpPsw.value || '').trim();
+
+  inpUser.value = "";
+  inpPsw.value = "";
+  /*
+    Qui inserisco dati nel db
+    se inseriti correttamente allora mando messaggio
+  */
+}
+
+
+function init() {
+  const loginBtn = document.getElementById("btn-login");
+  const signupBtn = document.getElementById("btn-signup");
+
+  if(!loginBtn){
+    console.log("Errore form non caricata.");
   }
 
+  loginBtn.addEventListener('click', login);
+  signupBtn.addEventListener('click', signup);
 
-  init();
+  
+}
 
-})();
+init();
