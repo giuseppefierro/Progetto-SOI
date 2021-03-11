@@ -1,59 +1,44 @@
 'use strict';
 
+/**
+ * Inserisce il nuovo dato con le info
+ * recuperate dal form nel DB del server. 
+ * Infine viene ricaricata la pagina dei dati del singolo progetto
+ * (essendo in locale verrà sempre ricaricata la stessa
+ * sequenza di dati e non sarà inserito quello nuovo)
+ */
 function insertData(){ 
   document.getElementById("insert-data").setAttribute("hidden", true);
 
   document.getElementById("new-data").reset();
 
+  //Info lette da form
   const data = document.querySelectorAll(".new-data-info");
-  const user = "new-user"; //leggi il nome utente
+  const user = "new-user"; //il nome utente e la data saranno recuperate quando sarà collegato al sever
   const orario = 17.40;
-
-  
   /**
    * Una volta inviate le info del nuovo dato da inserire al server
    * ricarico la pagina del progetto con showProject()
-   * Questo sotto andrà rimosso
+   * 
    */
 
   document.getElementById("databody").innerHTML ="";
   showProject();
-  /*
-  const tbody = document.querySelector('#databody');
-  const tr = document.createElement('tr');
-  
-  tr.setAttribute("id", data[0].value);
-  tbody.appendChild(tr);
-  
-  var td = document.createElement('td');
-  td.innerHTML = "<input type='radio' id="+ data[0].value + " name='data' class=" + data[1].value + " >";
-  tr.appendChild(td);
-
-  for(var j=0; j<data.length+2; j++){
-    if(j<1){
-      td = document.createElement('th');
-    }
-    else{
-      td = document.createElement('td');  
-    }
-    if(j<data.length){
-      td.textContent = data[j].value;
-    }
-    else if(j==data.length){ 
-      td.textContent=user;
-    }
-    else{ 
-      td.textContent=orario;
-    }
-    tr.appendChild(td);
-  }
-  */
 }
 
+/**
+ * Mette in modalità visibile il form per inserire un nuovo dato
+ */
 function createData(){
   document.getElementById("insert-data").removeAttribute("hidden");
 }
 
+/**
+ * Recupare il dato da eliminare tramite il radio button
+ * invia il dato da eliminare al server ed infine
+ * richiama la funzione per ricaricare la pagina dei dati
+ * (essendo in locale abbiamo scelto di rimuovere solamente l'html)
+ */
 function deleteData() {
   const selected = document.querySelector('input[type="radio"][name="data"]:checked');
   
@@ -74,11 +59,14 @@ function deleteData() {
    * ed infine (no: richiamare showProject() per ricare i progetti)
    * rimuoviamo l'html relativo
    */
-  //Come cancellare su html
   rowToDelete.remove();
 }
 
-
+/**
+ * Recupera il progetto selezionato di cui si vuole visualizzarne i dati
+ * (quando sarà collegato) richiama il server per recuperare i dati
+ * e li mette all'interno di una tabella
+ */
 function showProject() {
   //in selected recupero il progetto di cui si vuole visualizzare i dati
   const selected = document.querySelector('input[type="radio"][name="project"]:checked');
@@ -139,6 +127,11 @@ function showProject() {
 
 }
 
+/**
+ * Elimina il progetto selezionato
+ * essendo in locale elimina solo l'html ma una volta collegato al server 
+ * verrà ricaricata la pagina interamente
+ */
 function deleteProject() {
   const selected = document.querySelector('input[type="radio"]:checked');
   
@@ -168,8 +161,10 @@ function deleteProject() {
    */
 }
 
-// Invio i dati del nuovo progetto da creare
-// al server
+/**
+ * Invio i dati del nuovo progetto da creare al server
+ * e ricarico la pagina per mostrare a video tutti i progetti
+ */
 function insertProject() {
   document.querySelector(".new-page").setAttribute("hidden", true);
   document.getElementById("new-project").reset();
@@ -180,15 +175,14 @@ function insertProject() {
   const user = "new-user"; //leggi il nome utente
   const orario = 17.40;
   /**
-   *  Recupero le info del nuovo progetto ed
-   *  nvece di fare queste cose sotto
-   *  dovremo inviare al server i dati e richiamare
-   *  la funzione mainPage() per ricaricare i progetti disponibili.
+   *  Recupero le info del nuovo progetto le invio al server 
+   *  richiamo la funzione mainPage() per ricaricare i progetti disponibili.
    */
   
   document.getElementById("projectbody").innerHTML ="";
   mainPage();
   /*
+  //Ho usato questo codice solo per test
   //Non serve a niente tanto richiamo la funzione mainPage per
   //ricaricare la pagina con i progetti
   const tbody = document.querySelector('#projectbody');
@@ -231,6 +225,9 @@ function createProject() {
   document.querySelector(".new-page").removeAttribute("hidden");
 }
 
+/**
+ * Recupero (quando sarà implementato) dal server i progetti e li mostro
+ */
 function mainPage(){
   document.querySelector(".home-page").removeAttribute("hidden");
   document.querySelector(".data-page").setAttribute("hidden", true);
@@ -245,7 +242,7 @@ function mainPage(){
   const projects = [[123,"Animali", "user1", 12.30],
     [456, "Auto", "user2", 10.30],
     [789, "Scarpe", "user3", 9.30]
-  ]; //in project inseriremo i dati recuperati dal server
+  ]; //in project inseriremo i dati recuperati dal server, questa è una prova
 
   
   //Per ogni progetto recuperato inseriamo nella tabella i valori
@@ -275,7 +272,9 @@ function mainPage(){
 
 }
 
-
+/**
+ * Funzione per il bottone di logout
+ */
 function showLoginPage(){ 
   /**
    * Qualcosa con il server per dire che stai uscendo
@@ -291,24 +290,22 @@ function showLoginPage(){
 
 
 /**
- * Funzione di associata al click sul bottone di Login
- * nella pagina iniziale.
- * questa sarà una get
+ *  Funzione per il loginda implementare con servers
  */
 function login(){
   const inpUser = document.getElementById("user");
-  //const user = (inpUser.value || '').trim();
+  const user = (inpUser.value || '').trim();
   
   const inpPsw = document.getElementById("pass");
-  //const psw = (inpPsw.value || '').trim();
+  const psw = (inpPsw.value || '').trim();
 
-  inpUser.value = "";
-  inpPsw.value = "";
+  // inpUser.value = "";
+  // inpPsw.value = "";
 
-  // if(user=='' || psw==''){
-  //   alert("Inserisci user e password.");
-  //   return;
-  // }
+  if(user=='' || psw==''){
+    alert("Inserisci user e password.");
+    return;
+  }
   
   /**
    * Mi dovrò collegare al server per valutare
@@ -331,7 +328,7 @@ function login(){
 }
 
 /**
- * Questa sarà un richiesta di POST sul server
+ * Funzione per il signup da implementare con server
  */
 function signup(){
   const inpUser = document.getElementById("user");
