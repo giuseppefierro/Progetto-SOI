@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Progetto SOI - Fierro Martorana</title>
+  <meta name="description" content="Progetto SOI">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="Progetto SOI">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://soi-lab04">
+  <meta property="og:image" content="http://soi-lab04/icon.png">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/eos-icons.css">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  <!-- Parte di login/signup iniziale-->
+  <div class="login-page">
+    <div class="container text-center">
+      <h1 class="bg-light py-4 text-info">
+        <img class="logo" src="icon.png" width="52" alt="UniPR Logo">Progetto SOI
+      </h1>
+      <div class="d-flex justify-content-center">
+        <form class="w-50" name="login-user">
+          <input type="text" id="user" class="form-control" autocomplete="off" placeholder="Insert your username..." />
+          <input type="password" id="pass" class="form-control" autocomplete="off" placeholder="Insert your password" />
+        </form>
+      </div>
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-success" id="btn-login">LogIn</button>
+        <button type="submit" class="btn btn-primary" id="btn-signup">SignUp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HomePage che mostra tutti i progetti -->
+  <div hidden class="home-page">
+    <button type="submit" class="btn-logout">
+      <i class="eos-icons">exit_to_app</i>
+      <span>Logout</span>
+    </button>
+    <div class="container text-center">
+      <h1 class="bg-light py-4 text-info">
+        <img class="logo" src="icon.png" width="52" alt="UniPR Logo">Progetti Disponibili
+      </h1>
+      <div hidden class="new-page">
+        <div class="container text-center">
+          <div class="d-flex justify-content-center">
+            <form class="w-50" id="new-project">
+              <input type="text" id="projectid" class="form-control" autocomplete="off" placeholder="Inserisci ID del progetto..." />
+              <input type="text" id="projectname" class="form-control" autocomplete="off" placeholder="Inserisci nome del progetto..." />
+              <label for="points">Numero di campi (range fra 2 e 5):</label>
+              <input type="range" id="fields" name="points" min="2" max="5">
+            </form>
+          </div>
+          <div class="d-flex justify-content-center">
+            <button class="btn btn-success" id="btn-insert-project">Inserisci nuovo progetto</button>
+          </div>
+          <div hidden class="w-100 btn btn-success insertmsg">Progetto creato correttamente.</div>
+          <div hidden class="w-100 btn btn-danger deletemsg">Non è stato possibile creare il progetto.</div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center">
+        <button class="btn btn-success" id="btn-create-project">Crea nuovo progetto</button>
+        <button class="btn btn-warning" id="btn-update-project">Visualizza</button>
+        <button class="btn btn-danger" id="btn-delete-project">Cancella selezionato</button>
+      </div>
+      <!-- Pagina che permette di creare nuovi progetti -->
+      
+      <!--  Table -->
+      <div class="d-flex table-data">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th scope="col">ID</th>
+              <th scope="col">Progetto</th>
+              <th scope="col">User ultima modifica</th>
+              <th scope="col">Data ultima modifica</th>
+            </tr>
+          </thead>
+          <tbody id="projectbody">
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagina che permette di visualizzare/modificare i dati del progetto -->
+  <div hidden class="data-page">
+    <button type="submit" id="btn-back">
+      <i class="eos-icons">arrow_back</i>
+      <span>Home Page</span>
+    </button>
+    <button type="submit" class="btn-logout">
+      <i class="eos-icons">exit_to_app</i>
+      <span>Logout</span>
+    </button>
+    <div class="container text-center">
+      <h1 class="bg-light py-4 text-info" id="project"></h1>
+      <!-- Tabella per l'inserimento di nuovi dati -->
+      <div hidden id="insert-data">
+        <div class="d-flex table-data" >
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Campo 1</th>
+                <th scope="col">Campo 2</th>
+                <th scope="col">Campo 3</th>
+              </tr>
+            </thead>
+            <tbody id="new-databody">
+              <tr>
+                <form id="new-data">
+                  <th scope="row"><input type="text" class="new-data-info" placeholder="Inserisci il nuovo ID o quello del dato da modificare"></th>
+                  <td><input type="text" class="new-data-info" placeholder="Inserisci il campo"></td>
+                  <td><input type="text" class="new-data-info" placeholder="Inserisci il campo"></td>
+                  <td><input type="text" class="new-data-info" placeholder="Inserisci il campo"></td>
+                </form>
+              </tr>
+            </tbody>
+          </table>  
+        </div>
+        <div class="d-flex justify-content-center">
+          <button class="btn btn-success" id="btn-insert-data">Inserisci nuovo dato</button>
+        </div>  
+      </div>
+      <!-- Tabella per la visualizzazione dei dati del progetto -->
+      <div class="d-flex justify-content-center">
+        <button class="btn btn-success" id="btn-create-data">Crea un nuovo dato</button>
+        <button class="btn btn-warning" id="btn-update-data">Modifica selezionato</button>
+        <button class="btn btn-danger" id="btn-delete-data">Cancella selezionato</button>
+      </div>
+      <div class="d-flex table-data">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th scope="col">ID dato</th>        
+              <th scope="col">Campo 1</th>
+              <th scope="col">Campo 2</th>
+              <th scope="col">Campo 3</th>
+              <th scope="col">Utente</th>
+              <th scope="col">Data</th>
+            </tr>
+          </thead>
+          <tbody id="databody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  
+<script src="js/vendor/modernizr-3.11.2.min.js"></script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
