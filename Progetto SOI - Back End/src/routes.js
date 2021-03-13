@@ -131,7 +131,7 @@ function routes(app) {
 		    total: objects.length,
 		    results: objects
 		}); */
-		});
+	});
 	
 	app.post('/signup', (req, resp) =>{
 	    const {username, password} = req.body;
