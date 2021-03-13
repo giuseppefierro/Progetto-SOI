@@ -226,6 +226,9 @@
         } else {
           e.response = req.responseText;
         }
+        var erroreMessage = JSON.parse(req.responseText);
+        alert(erroreMessage.error);
+        
         reject(e);
       }
     }
@@ -377,19 +380,16 @@
     console.log("Starting signup process...");
     const inpUser = document.getElementById("user");
     const user = (inpUser.value || '').trim();
-    
+    inpUser.value = '';
+
     const inpPsw = document.getElementById("pass");
     const psw = (inpPsw.value || '').trim();
+    inpPsw.value = '';
 
-    if(user=='' || psw==''){
-      alert("Insert user and password.");
-      return;
-    }
-    
     const userModel = new RestUserModel(user, psw, client);
-    console.log(`Saving new user '${userModel}'...`);
+    console.log(`Saving new user '${userModel.username}' ...`);
+    
     await userModel.create();
-
     console.log('User successfully saved', {userModel: userModel.toDto()});
   }
 
@@ -399,7 +399,7 @@
 
     const signupBtn = document.getElementById("btn-signup");
     signupBtn.addEventListener('click', signup); //funzione di signup
-
+    
   }
 
 
