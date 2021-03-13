@@ -111,18 +111,39 @@ function isInteger(n) {
 }
 
 function routes(app) {
+	
+	app.getUser('/login', (req, resp) => {
+		console.debug('Retrieving a user');
+		//const param = req.params.user;
 
+		const user = users.find(p => p.user === req.params.user && p.password === req.params.password);
+		if (!user) {
+		    resp.status(404);
+		    resp.json({error: 'User and password not found'});
+		    return;
+		}
+
+		console.info('User successfully logged', {user});
+		resp.status(201);
+		resp.json(toDTO(user));
+		/* const objects = users.map(toDTOUser);
+		resp.json({
+		    total: objects.length,
+		    results: objects
+		}); */
+		});
+	
 	app.post('/signup', (req, resp) =>{
 	    const {username, password} = req.body;
-        console.debug('Attempting to crete a new user', {username, password});
-        const user = new User(username, password);
-        users.push(user);
-        console.info('Task successfully created', {user});
-        
-		console.debug('\nUsers logged:', users);
+            console.debug('Attempting to crete a new user', {username, password});
+            const user = new User(username, password);
+            users.push(user);
+            console.info('Task successfully created', {user});
+  
+	    console.debug('\nUsers logged:', users);
 		
-        resp.status(201);
-        resp.json(userToDTO(user));
+            resp.status(201);
+            resp.json(userToDTO(user));
 	});
 	
 	/*
