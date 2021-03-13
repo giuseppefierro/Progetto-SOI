@@ -111,40 +111,33 @@ function isInteger(n) {
 }
 
 function routes(app) {
-	
-	app.getUser('/login', (req, resp) => {
-		console.debug('Retrieving a user');
-		//const param = req.params.user;
 
-		const user = users.find(p => p.user === req.params.user && p.password === req.params.password);
-		if (!user) {
-		    resp.status(404);
-		    resp.json({error: 'User and password not found'});
-		    return;
-		}
+	app.post('/signup', (req, resp) => {
+        const {username, password} = req.body;
+        console.debug(users);
+        console.debug('\nAttempting to create a new user', {username});
 
-		console.info('User successfully logged', {user});
-		resp.status(201);
-		resp.json(toDTO(user));
-		/* const objects = users.map(toDTOUser);
-		resp.json({
-		    total: objects.length,
-		    results: objects
-		}); */
-	});
-	
-	app.post('/signup', (req, resp) =>{
-	    const {username, password} = req.body;
-            console.debug('Attempting to crete a new user', {username, password});
-            const user = new User(username, password);
-            users.push(user);
-            console.info('Task successfully created', {user});
-  
-	    console.debug('\nUsers logged:', users);
-		
-            resp.status(201);
-            resp.json(userToDTO(user));
-	});
+        if (users.find(p => p.username === username)) {
+        	console.debug('User already used', {username});
+            resp.status(401);
+            resp.json({error: 'Username alredy used'});
+            return;
+        }
+        else if(!isNonBlank(username) || !isNonBlank(password))
+        {
+        	console.debug('\nThere is no username or password.');
+            resp.status(401);
+            resp.json({error: 'Insert a username and a valid password'});
+            return;
+        }
+
+        const user = new User(username, password);
+        users.push(user);
+        console.info('\nUser was successfully created', {user});
+		console.debug('\nRegistered users:', {username});
+        resp.status(201);
+        resp.json(userToDTO(user));
+    });
 	
 	/*
 	
