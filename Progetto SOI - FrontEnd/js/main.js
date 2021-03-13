@@ -1,406 +1,408 @@
 'use strict';
 
-/**
- * Inserisce il nuovo dato con le info
- * recuperate dal form nel DB del server. 
- * Infine viene ricaricata la pagina dei dati del singolo progetto
- * (essendo in locale verrà sempre ricaricata la stessa
- * sequenza di dati e non sarà inserito quello nuovo)
- */
-function insertData(){ 
-  document.getElementById("insert-data").setAttribute("hidden", true);
-
-  document.getElementById("new-data").reset();
-
-  //Info lette da form
-  const data = document.querySelectorAll(".new-data-info");
-  const user = "new-user"; //il nome utente e la data saranno recuperate quando sarà collegato al sever
-  const orario = 17.40;
-  /**
-   * Una volta inviate le info del nuovo dato da inserire al server
-   * ricarico la pagina del progetto con showProject()
-   * 
-   */
-
-  document.getElementById("databody").innerHTML ="";
-  showProject();
-}
-
-/**
- * Mette in modalità visibile il form per inserire un nuovo dato
- */
-function createData(){
-  document.getElementById("insert-data").removeAttribute("hidden");
-}
-
-/**
- * Recupare il dato da eliminare tramite il radio button
- * invia il dato da eliminare al server ed infine
- * richiama la funzione per ricaricare la pagina dei dati
- * (essendo in locale abbiamo scelto di rimuovere solamente l'html)
- */
-function deleteData() {
-  const selected = document.querySelector('input[type="radio"][name="data"]:checked');
-  
-  if(selected == null){
-    alert("Seleziona un dato.");
-    return;
- }
-  
-  console.log("Cancello dato " + selected.getAttribute("id"));
-
-  const id = selected.getAttribute("id");
-
-  const rowToDelete = document.getElementById(id);
+(function () {
 
   /**
-   * Dopo aver identificato il progetto da rimuovere
-   * dovremo inviare la richiesta al server per rimuoverlo 
-   * ed infine (no: richiamare showProject() per ricare i progetti)
-   * rimuoviamo l'html relativo
+   * Creates a new sequence function.
+   * @return {function(): number} A function that returns sequences of numbers on each call
    */
-  rowToDelete.remove();
-}
-
-/**
- * Recupera il progetto selezionato di cui si vuole visualizzarne i dati
- * (quando sarà collegato) richiama il server per recuperare i dati
- * e li mette all'interno di una tabella
- */
-function showProject() {
-  //in selected recupero il progetto di cui si vuole visualizzare i dati
-  const selected = document.querySelector('input[type="radio"][name="project"]:checked');
-  console.log(selected);
-
-  if(selected == null){
-    alert("Seleziona un progetto.");
-    return;
-  }
-
-  document.querySelector(".home-page").setAttribute("hidden", true);
-  
-  document.getElementById("projectbody").innerHTML = '';
-
-
-  document.querySelector(".data-page").removeAttribute("hidden");
-
-
-  const h1 = document.getElementById("project");
-
-  
-  h1.innerHTML = "<img class='logo' src='icon.png' width='52' alt='UniPR Logo'> Progetto: " + selected.getAttribute("class");
-  console.log(selected.getAttribute("class"));
-  /*
-   *  Contatto il server e inserisco i dati recuperati
-   *  nel div appropriato
-   */
-
-  //Dati che copieremo dal DB
-  const data = [[123,"Cane", "5kg", "10m", "user1", 12.30],
-    [456, "Gatto", "5kg", "10m", "user2", 10.30]
-  ]; //in project inseriremo i dati recuperati dal server
-
-  
-  //Per ogni progetto recuperato inseriamo nella tabella i valori
-  for(var i=0; i<data.length; i++){
-    const tbody = document.querySelector('#databody');
-    const tr = document.createElement('tr');
-    
-    tr.setAttribute("id", data[i][0]);
-    tbody.appendChild(tr);
-    
-    var td = document.createElement('td');
-    td.innerHTML = "<input type='radio' id="+ data[i][0] + " name='data' class=" + data[i][1] + " >";
-    tr.appendChild(td);
-
-    for(var j=0; j<data[0].length; j++){
-      if(j<1){
-        td = document.createElement('th');
-      }
-      else{
-        td = document.createElement('td');  
-      }
-      td.textContent = data[i][j];
-      tr.appendChild(td);
+  function sequencer() {
+    let i = 1;
+    return function () {
+      const n = i;
+      i++;
+      return n;
     }
   }
 
-}
-
-/**
- * Elimina il progetto selezionato
- * essendo in locale elimina solo l'html ma una volta collegato al server 
- * verrà ricaricata la pagina interamente
- */
-function deleteProject() {
-  const selected = document.querySelector('input[type="radio"]:checked');
-  
-  if(selected == null){
-    alert("Seleziona un progetto.");
-    return;
-  }
-  
-  console.log("Cancello progetto " + selected.getAttribute("id"));
-
-  const id = selected.getAttribute("id");
-
-  const rowToDelete = document.getElementById(id);
-
   /**
-   * Dopo aver identificato il progetto da rimuovere
-   * dovremo inviare la richiesta al server per rimuoverlo 
-   * ed infine richiamare mainPage() per ricare i progetti
+   * An event handler that keeps track of the callback reference added
+   * to an HTML element using `addEventListener` and removed with
+   * `removeEventListener`.
    */
-
-  //Cancello solo su html per prova
-  rowToDelete.remove();
-
-  /**
-   * document.getElementById("projectbody") = "";
-   * mainPage();
-   */
-}
-
-/**
- * Invio i dati del nuovo progetto da creare al server
- * e ricarico la pagina per mostrare a video tutti i progetti
- */
-function insertProject() {
-  document.querySelector(".new-page").setAttribute("hidden", true);
-  document.getElementById("new-project").reset();
-
-  const id = document.getElementById("projectid").value;
-  const name = document.getElementById("projectname").value;
-  const fields = document.getElementById("fields").value;
-  const user = "new-user"; //leggi il nome utente
-  const orario = 17.40;
-  /**
-   *  Recupero le info del nuovo progetto le invio al server 
-   *  richiamo la funzione mainPage() per ricaricare i progetti disponibili.
-   */
-  
-  document.getElementById("projectbody").innerHTML ="";
-  mainPage();
-  /*
-  //Ho usato questo codice solo per test
-  //Non serve a niente tanto richiamo la funzione mainPage per
-  //ricaricare la pagina con i progetti
-  const tbody = document.querySelector('#projectbody');
-  const tr = document.createElement('tr');
-  
-  tr.setAttribute("id", id);
-  tbody.appendChild(tr);
-  
-  var td = document.createElement('td');
-  td.innerHTML = "<input type='radio' id="+ id + " name='data' class=" + name + " >";
-  tr.appendChild(td);
-
-  for(var j=0; j<4; j++){
-    if(j<2){
-      td = document.createElement('th');
-      if(j==0){
-        td.textContent = id;
-      }
-      else{
-        td.textContent = name;
-      }
+  class Handler {
+    /**
+     * Instances a new `Handler` and registers the `callback` function
+     * for the specified `event` at the `element` level.
+     * @param event {string} The event name
+     * @param element {HTMLElement} An HTML element
+     * @param callback {Function} The function to be invoked on `event`
+     */
+    constructor(event, element, callback) {
+      this._event = event;
+      this._element = element;
+      this._callback = callback;
+      this._element.addEventListener(this._event, this._callback);
     }
-    else{
-      td = document.createElement('td');  
-      if(j==2){
-        td.textContent=user;
-      }
-      else{
-        td.textContent=orario;
-      }
-    }
-    tr.appendChild(td);
-  }
-  */
-}
 
-//In questa funzione rendo visibile il form per l'inserimento 
-// di un nuovo progetto
-function createProject() {
-  document.querySelector(".new-page").removeAttribute("hidden");
-}
-
-/**
- * Recupero (quando sarà implementato) dal server i progetti e li mostro
- */
-function mainPage(){
-  document.querySelector(".home-page").removeAttribute("hidden");
-  document.querySelector(".data-page").setAttribute("hidden", true);
-  document.getElementById("databody").innerHTML="";
-  /**
-   * Contatto il server con GET e recupero:
-   * ID dei progetti, utente ultima modifica, ultima modifica
-   * 
-   * Devo riempire la tabella 
-   */
-
-  const projects = [[123,"Animali", "user1", 12.30],
-    [456, "Auto", "user2", 10.30],
-    [789, "Scarpe", "user3", 9.30]
-  ]; //in project inseriremo i dati recuperati dal server, questa è una prova
-
-  
-  //Per ogni progetto recuperato inseriamo nella tabella i valori
-  for(var i=0; i<projects.length; i++){
-    const tbody = document.querySelector('#projectbody');
-    const tr = document.createElement('tr');
-    
-    tr.setAttribute("id", projects[i][0]);
-    tbody.appendChild(tr);
-    
-    var td = document.createElement('td');
-    td.innerHTML = "<input type='radio' id="+ projects[i][0] + " name='project' class=" + projects[i][1] + " >";
-    tr.appendChild(td);
-
-    for(var j=0; j<projects[0].length; j++){
-      if(j<2){
-        td = document.createElement('th');
-      }
-      else{
-        td = document.createElement('td');  
-      }
-      td.textContent = projects[i][j];
-      tr.appendChild(td);
-    }
-    
-  }
-
-}
-
-/**
- * Funzione per il bottone di logout
- */
-function showLoginPage(){ 
-  /**
-   * Qualcosa con il server per dire che stai uscendo
-   */
-  document.getElementById("projectbody").innerHTML="";
-  document.getElementById("databody").innerHTML="";
-
-  document.querySelector(".home-page").setAttribute("hidden", true);
-  document.querySelector(".data-page").setAttribute("hidden", true);
-
-  document.querySelector(".login-page").removeAttribute("hidden");
-}
-
-
-/**
- *  Funzione per il loginda implementare con servers
- */
-function login(){
-  const inpUser = document.getElementById("user");
-  const user = (inpUser.value || '').trim();
-  
-  const inpPsw = document.getElementById("pass");
-  const psw = (inpPsw.value || '').trim();
-
-  // inpUser.value = "";
-  // inpPsw.value = "";
-
-  if(user=='' || psw==''){
-    alert("Inserisci user e password.");
-    return;
-  }
-  
-  /**
-   * Mi dovrò collegare al server per valutare
-   * se user e password sono presenti nel DB.
-  */
-  var checked = true;
-  /**
-   * Se user,password OK => home-page
-   * altrimenti msg di errore
-   */
-  if(checked){
-    document.querySelector(".login-page").setAttribute("hidden", true);
-    mainPage();
-  }
-  else{
-    alert("Non sei registrato, registrati.");
-  }
-  
-
-}
-
-/**
- * Funzione per il signup da implementare con server
- */
-function signup(){
-  const inpUser = document.getElementById("user");
-  const user = (inpUser.value || '').trim();
-  
-  const inpPsw = document.getElementById("pass");
-  const psw = (inpPsw.value || '').trim();
-
-  inpUser.value = "";
-  inpPsw.value = "";
-  /*
-    Qui inserisco dati nel db
-    se inseriti correttamente allora mando messaggio
-  */
-}
-
-
-function init() {
-  /**
-   * Listener per i pulsanti della login page
-   */
-  const loginBtn = document.getElementById("btn-login");
-  loginBtn.addEventListener('click', login);//funzione di login
-
-  const signupBtn = document.getElementById("btn-signup");
-  signupBtn.addEventListener('click', signup); //funzione di signup
-
-  /**
-   * Listener per i pulsanti presenti nella home page
-   */
-  const updateBtn = document.getElementById("btn-update-project");
-  updateBtn.addEventListener('click', showProject); //Funzione per la visualizzazione dei dati di un progetto
-
-  const createBtn = document.getElementById("btn-create-project");
-  createBtn.addEventListener('click', createProject); //Funzione per la creazione di un nuovo progetto
-
-  const deleteBtn = document.getElementById("btn-delete-project");
-  deleteBtn.addEventListener('click', deleteProject); //Funzione per l'eliminazione di un progetto presente
-  
-
-  /**
-   * Listener per l'inserimento di un nuovo progetto
-   */
-  const insertBtn = document.getElementById("btn-insert-project");
-  insertBtn.addEventListener('click', insertProject);
-
-  /**
-   * Listener per i pulsanti presenti nella schermata
-   * di visualizzazione dei dati dei singoli progetti 
-   */
-   const deleteDataBtn = document.getElementById("btn-delete-data");
-   deleteDataBtn.addEventListener('click', deleteData);
- 
-   const createDataBtn = document.getElementById("btn-create-data");
-   createDataBtn.addEventListener('click', createData);
-
-
-   /**
-    * Listener per il form per l'inserimento di nuovi dati
-    */
-    const insertDataBtn = document.getElementById("btn-insert-data");
-    insertDataBtn.addEventListener('click', insertData);
-
-    const backBtn = document.getElementById("btn-back");
-    backBtn.addEventListener('click', mainPage);
+    //@formatter:off
+    get event() { return this._event; }
+    get element() { return this._element; }
+    get callback() { return this._callback; }
+    //@formatter:on
 
     /**
-     * Listener per il logout
+     * Unregisters this handler.
+		Ovveri rimuove gli evListener associati ai bottoni dei task rimossi
      */
-    const logoutBtn = document.getElementsByClassName("btn-logout");
-    logoutBtn[0].addEventListener('click', showLoginPage);
-    logoutBtn[1].addEventListener('click', showLoginPage);
-}
+    unregister() {
+      this._element.removeEventListener(this._event, this._callback);
+    }
+  }
 
-init();
+  /**
+   * An entity that is able to emit events certain subscribers are
+   * interested into.
+   */
+  class EventEmitter {
+    constructor() {
+      this._subscribers = [];
+      this._seq = sequencer();
+    }
+
+    /**
+     * Adds a new subscriber for the specified event.
+     * @param event
+     * @param callback
+     */
+    on(event, callback) {
+      const id = this._seq();
+      this._subscribers.push({id, event, callback});
+      return {
+        unsubscribe: this._unsubscribe.bind(this)
+      };
+    }
+
+    _unsubscribe(anId) {
+      const j = this._subscribers.findIndex(s => s.id === anId);
+      if (j >= 0) {
+        this._subscribers.splice(j, 1);
+      }
+    }
+
+    /**
+     * Emits an event. This immediately triggers any callback that has
+     * been subscribed for the exact same event.
+     * @param event {string} The event name
+     * @param data {Object?} Any additional data passed to the callback.
+     */
+    emit(event, data) {
+      this._subscribers
+        .filter(s => s.event === event)
+        .forEach(s => s.callback(data));
+    }
+  }
+
+  /**
+   * A project.
+   */
+  class ProjectModel {
+    constructor(id, projectName) {
+      this._id = id;
+      this._projectName = projectName;
+    }
+
+    //@formatter:off
+    get id() { return this._id; }
+    set id(id) { this._id = id; }
+    get projectName() { return this._projectName; }
+    set projectName(projectName) { this._projectName = projectName; }
+    //@formatter:on
+  }
+
+  /**
+   * A data.
+   */
+   class DataModel {
+	  
+    constructor(id, projectid, fields, user) {
+      this._id = id;
+      this._projectid = projectid;
+      this._fields = fields;
+      this._user = user;
+      this._timestamp = new Date();
+    }
+
+    //@formatter:off
+    get id() { return this._id; }
+    set id(id) { this._id = id; }
+
+    get projectid() { return this._projectid; }
+    set projectid(projectid) { this._projectid = projectid; }
+
+    get fields() { return this._fields; }
+    set fields(fields) { this._fields = fields; }
+
+    get user() { return this._user; }
+    set user(user) { this._user = user; }
+
+    get timestamp() { return this._timestamp; }
+    set timestamp(ts) { this._timestamp = ts; }
+    //@formatter:on
+  }
+
+  /**
+   * A data.
+   */
+   class UserModel {
+	  
+    constructor(username, password) {
+      this._username = username;
+      this._password = password;
+    }
+
+    //@formatter:off
+    get username() { return this._username; }
+    set username(username) { this._username = username; }
+
+    get password() { return this._password; }
+    set password(password) { this._password = password; }
+    //@formatter:on
+  }
+
+  function endRemoveAndTrim(str, char) {
+    if (str) {
+      str = str.trimRight();
+      while (str && str[str.length - 1] === char) {
+        str = str.substr(0, str.length - 1).trimRight();
+      }
+    }
+    return str;
+  }
+
+  function startRemoveAndTrim(str, char) {
+    if (str) {
+      str = str.trimLeft();
+      while (str && str[0] === char) {
+        str = str.substr(1, str.length - 1).trimLeft();
+      }
+    }
+    return str;
+  }
+
+  function mkUrl(baseUrl, path, queryParams) {
+    const bu = endRemoveAndTrim((baseUrl || '').trim(), '/');
+    const p = startRemoveAndTrim(path.trim(), '/');
+    let url = [bu, p].join('/');
+    if (queryParams && typeof queryParams === 'object') {
+      const params = [];
+      for (let key of Object.keys(queryParams)) {
+        const k = encodeURIComponent(key);
+        const val = queryParams[key];
+        if (val) {
+          let v = encodeURIComponent(val);
+          params.push(`${k}=${v}`);
+        } else {
+          params.push(k)
+        }
+      }
+      if (params.length) {
+        url += '?' + params.join('&');
+      }
+    }
+
+    return url;
+  }
+
+  function handleJsonResponse(req, resolve, reject) {
+    if (req.readyState === XMLHttpRequest.DONE) {
+      // Everything is good, the response was received.
+      if (req.status === 200 || req.status === 201) {
+        const hdr = req.getResponseHeader('Content-type');
+        if (hdr.substr(0, 16) === 'application/json' || hdr.substr(0, 9) === 'text/json') {
+          resolve(JSON.parse(req.responseText));
+        } else {
+          const e = new Error('Not a JSON response');
+          e.status = req.status;
+          e.response = req.responseText;
+          reject(e);
+        }
+      } else {
+        const hdr = req.getResponseHeader('Content-type');
+        const e = new Error('Operation failed');
+        e.status = req.status;
+        if (hdr === 'application/json' || hdr === 'text/json') {
+          e.json = JSON.parse(req.responseText);
+        } else {
+          e.response = req.responseText;
+        }
+        reject(e);
+      }
+    }
+  }
+
+  function setHeaders(req, headers) {
+    if (headers && typeof headers === 'object') {
+      for (let key of Object.keys(headers)) {
+        req.setRequestHeader(key, headers[key]);
+      }
+    }
+  }
+
+  /**
+   * A minimal AJAX client for RESTful APIs.
+   */
+  class RestClient {
+    /**
+     * Instances a new `RestClient`.
+     * @param baseUrl {string?} Optional baseUrl
+     */
+    constructor(baseUrl) {
+      this._baseUrl = baseUrl;
+    }
+
+    /**
+     * Sends an AJAX request for the specified `method`.
+     * @param method {'GET'|'POST'|'PUT'|'DELETE'} HTTP method
+     * @param path {string} The URL path to be appended to this `baseUrl`
+     * @param body {Object?} Optional body of the message, will be converted to JSON if present
+     * @param queryParams {Object?} Optional query parameters
+     * @param headers {Object?} Optional headers
+     * @return {Promise} A promise of the JSON response.
+     * @private
+     */
+    _send(method, path, body, queryParams, headers) {
+      return new Promise((resolve, reject) => {
+        const req = new XMLHttpRequest();
+
+        // prepares the response handler
+        req.onreadystatechange = () => handleJsonResponse(req, resolve, reject);
+        req.open(method, mkUrl(this._baseUrl, path, queryParams));
+
+        // populates additional headers
+        setHeaders(req, headers);
+
+        // send request
+        if (body) {
+          req.setRequestHeader('Content-Type', 'application/json');
+          req.send(JSON.stringify(body));
+        } else {
+          req.send();
+        }
+      });
+    }
+
+    /**
+     * Sends a GET request.
+     * @param path {string} URL path to be appended to base URL.
+     * @param queryParams {Object?} Optional query parameters
+     * @param headers {Object?} Optional headers
+     * @return {Promise} A promise of the JSON response.
+     */
+    get(path, queryParams, headers) {
+      return this._send('GET', path, null, queryParams, headers);
+    }
+
+    /**
+     * Sends a POST request.
+     * @param path {string} URL path to be appended to base URL.
+     * @param body {Object?} Optional body of the message, will be converted to JSON if present
+     * @param queryParams {Object?} Optional query parameters
+     * @param headers {Object?} Optional headers
+     * @return {Promise} A promise of the JSON response.
+     */
+    post(path, body, queryParams, headers) {
+      return this._send('POST', path, body, queryParams, headers);
+    }
+
+    /**
+     * Sends a PUT request.
+     * @param path {string} URL path to be appended to base URL.
+     * @param body {Object?} Optional body of the message, will be converted to JSON if present
+     * @param queryParams {Object?} Optional query parameters
+     * @param headers {Object?} Optional headers
+     * @return {Promise} A promise of the JSON response.
+     */
+    put(path, body, queryParams, headers) {
+      return this._send('PUT', path, body, queryParams, headers);
+    }
+
+    /**
+     * Sends a DELETE request.
+     * @param path {string} URL path to be appended to base URL.
+     * @param queryParams {Object?} Optional query parameters
+     * @param headers {Object?} Optional headers
+     * @return {Promise} A promise of the JSON response.
+     */
+    del(path, queryParams, headers) {
+      return this._send('DELETE', path, null, queryParams, headers);
+    }
+  }
+
+  /**
+   * A user that can be synchronized with the REST API.
+   */
+   class RestUserModel extends UserModel {
+    /**
+     * Instances a new `RestTaskModel`.
+     * @param username {string} Username
+     * @param password {string} password
+     * @param client {RestClient} A rest client
+     */
+    constructor(username, password, client) {
+      super(username, password); //chiama il costruttore del padre
+      this._client = client;
+    }
+	
+	/*
+	 Dto = Data Transfer Object
+	 oggetto scambiato nelle comunicazioni
+	*/
+    toDto() {
+      return {username: this.username, password: this.password};
+    }
+	
+	/*
+		Invio il nuovo task al server tramite post
+		ritorno l'oggetto this
+	*/
+    async create() {
+      let dto = this.toDto();
+      dto = await this._client.post('signup', dto); //invio al server dto(=il nuovo task con id(=null),desc e timestamp)
+      this.username = dto.username;
+      this.password = dto.password;
+      return this;
+    }
+	
+  }
+
+  const tasks = [];
+  const client = new RestClient('/api');
+
+
+  /**
+   *  Funzione per il login da implementare con servers
+   */
+  async function signup(){
+    console.log("Starting signup process...");
+    const inpUser = document.getElementById("user");
+    const user = (inpUser.value || '').trim();
+    
+    const inpPsw = document.getElementById("pass");
+    const psw = (inpPsw.value || '').trim();
+
+    if(user=='' || psw==''){
+      alert("Insert user and password.");
+      return;
+    }
+    
+    const userModel = new RestUserModel(user, psw, client);
+    console.log(`Saving new user '${userModel}'...`);
+    await userModel.create();
+
+    console.log('User successfully saved', {userModel: userModel.toDto()});
+  }
+
+
+
+  async function init() {
+
+    const signupBtn = document.getElementById("btn-signup");
+    signupBtn.addEventListener('click', signup); //funzione di signup
+
+  }
+
+
+  init();
+
+})();
